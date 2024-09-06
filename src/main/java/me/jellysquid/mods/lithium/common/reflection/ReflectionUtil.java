@@ -1,15 +1,15 @@
 package me.jellysquid.mods.lithium.common.reflection;
 
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.crash.CrashException;
-import net.minecraft.util.crash.CrashReport;
-import net.minecraft.util.crash.CrashReportSection;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.CrashReport;
+import net.minecraft.CrashReportCategory;
+import net.minecraft.ReportedException;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.fml.loading.FMLLoader;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,13 +37,13 @@ public class ReflectionUtil {
                 return fallbackResult;
             } catch (Throwable e) {
                 final String crashedClass = clazz.getName();
-                CrashReport crashReport = CrashReport.create(e, "Lithium Class Analysis");
-                CrashReportSection crashReportSection = crashReport.addElement(e.getClass().toString() + " when getting declared methods.");
-                crashReportSection.add("Analyzed class", crashedClass);
-                crashReportSection.add("Analyzed method name", methodName);
-                crashReportSection.add("Analyzed method args", methodArgs);
+                CrashReport crashReport = CrashReport.forThrowable(e, "Lithium Class Analysis");
+                CrashReportCategory crashReportSection = crashReport.addCategory(e.getClass().toString() + " when getting declared methods.");
+                crashReportSection.setDetail("Analyzed class", crashedClass);
+                crashReportSection.setDetail("Analyzed method name", methodName);
+                crashReportSection.setDetail("Analyzed method args", methodArgs);
 
-                throw new CrashException(crashReport);
+                throw new ReportedException(crashReport);
             }
         }
         return false;
@@ -52,7 +52,7 @@ public class ReflectionUtil {
     //How to find the remapped methods:
     //1) Run in the debugger: System.out.println(FabricLoader.getInstance().getMappingResolver().getNamespaceData("intermediary").methodNames)
     //2) Ctrl+F for the method name, in this case "onEntityCollision". Make sure to find the correct one.
-    private static final String REMAPPED_ON_ENTITY_COLLISION = FabricLoader.getInstance().getMappingResolver().mapMethodName("intermediary", "net.minecraft.class_4970", "method_9548", "(Lnet/minecraft/class_2680;Lnet/minecraft/class_1937;Lnet/minecraft/class_2338;Lnet/minecraft/class_1297;)V");
+    private static final String REMAPPED_ON_ENTITY_COLLISION = FMLLoader.isProduction() ? "entityInside" : "onEntityCollision";
     private static final WeakHashMap<Class<?>, Boolean> CACHED_IS_ENTITY_TOUCHABLE = new WeakHashMap<>();
     public static boolean isBlockStateEntityTouchable(BlockState operand) {
         Class<? extends Block> blockClazz = operand.getBlock().getClass();
@@ -61,7 +61,7 @@ public class ReflectionUtil {
         if (result != null) {
             return result;
         }
-        boolean res = ReflectionUtil.hasMethodOverride(blockClazz, AbstractBlock.class, true, REMAPPED_ON_ENTITY_COLLISION, BlockState.class, World.class, BlockPos.class, Entity.class);
+        boolean res = ReflectionUtil.hasMethodOverride(blockClazz, BlockBehaviour.class, true, REMAPPED_ON_ENTITY_COLLISION, BlockState.class, Level.class, BlockPos.class, Entity.class);
         CACHED_IS_ENTITY_TOUCHABLE.put(blockClazz, res);
         return res;
     }

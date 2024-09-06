@@ -1,8 +1,7 @@
 @MixinConfigOption(
         description = "Skips being pushed by fluids when the nearby chunk sections do not contain this fluid",
         depends = {
-                @MixinConfigDependency(dependencyPath = "mixin.util.block_tracking"),
-                @MixinConfigDependency(dependencyPath = "mixin.experimental.entity.block_caching.fluid_pushing", enabled = false)
+                @MixinConfigDependency(dependencyPath = "mixin.util.block_tracking")
         }
 )
 package me.jellysquid.mods.lithium.mixin.entity.collisions.fluid;

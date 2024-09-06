@@ -2,20 +2,20 @@ package me.jellysquid.mods.lithium.common.entity;
 
 import it.unimi.dsi.fastutil.objects.Reference2ByteOpenHashMap;
 import me.jellysquid.mods.lithium.common.reflection.ReflectionUtil;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.boss.dragon.EnderDragonEntity;
-import net.minecraft.entity.mob.ShulkerEntity;
-import net.minecraft.entity.projectile.BreezeWindChargeEntity;
-import net.minecraft.entity.projectile.WindChargeEntity;
-import net.minecraft.entity.vehicle.MinecartEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.monster.Shulker;
+import net.minecraft.world.entity.projectile.windcharge.BreezeWindCharge;
+import net.minecraft.world.entity.projectile.windcharge.WindCharge;
+import net.minecraft.world.entity.vehicle.Minecart;
+import net.neoforged.fml.loading.FMLLoader;
 
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 /**
- * Class for grouping Entity classes by some property for use in TypeFilterableList
+ * Class for grouping Entity classes by some property for use in ClassInstanceMultiMap
  * It is intended that an EntityClassGroup acts as if it was immutable, however we cannot predict which subclasses of
  * Entity might appear. Therefore we evaluate whether a class belongs to the class group when it is first seen.
  * Once a class was evaluated the result of it is cached and cannot be changed.
@@ -26,18 +26,18 @@ public class EntityClassGroup {
     public static final EntityClassGroup CUSTOM_COLLIDE_LIKE_MINECART_BOAT_WINDCHARGE; //aka entities that will attempt to collide with all other entities when moving
 
     static {
-        String remapped_collidesWith = FabricLoader.getInstance().getMappingResolver().mapMethodName("intermediary", "net.minecraft.class_1297", "method_30949", "(Lnet/minecraft/class_1297;)Z");
+        String remapped_collidesWith = FMLLoader.isProduction() ? "canCollideWith" : "collidesWith";
         CUSTOM_COLLIDE_LIKE_MINECART_BOAT_WINDCHARGE = new EntityClassGroup(
                 (Class<?> entityClass) -> ReflectionUtil.hasMethodOverride(entityClass, Entity.class, true, remapped_collidesWith, Entity.class));
 
         //sanity check: in case intermediary mappings changed, we fail
-        if ((!CUSTOM_COLLIDE_LIKE_MINECART_BOAT_WINDCHARGE.contains(MinecartEntity.class))) {
+        if ((!CUSTOM_COLLIDE_LIKE_MINECART_BOAT_WINDCHARGE.contains(Minecart.class))) {
             throw new AssertionError();
         }
-        if ((!CUSTOM_COLLIDE_LIKE_MINECART_BOAT_WINDCHARGE.contains(WindChargeEntity.class)) || (!CUSTOM_COLLIDE_LIKE_MINECART_BOAT_WINDCHARGE.contains(BreezeWindChargeEntity.class))) {
+        if ((!CUSTOM_COLLIDE_LIKE_MINECART_BOAT_WINDCHARGE.contains(WindCharge.class)) || (!CUSTOM_COLLIDE_LIKE_MINECART_BOAT_WINDCHARGE.contains(BreezeWindCharge.class))) {
             throw new AssertionError();
         }
-        if ((CUSTOM_COLLIDE_LIKE_MINECART_BOAT_WINDCHARGE.contains(ShulkerEntity.class))) {
+        if ((CUSTOM_COLLIDE_LIKE_MINECART_BOAT_WINDCHARGE.contains(Shulker.class))) {
             //should not throw an Error here, because another mod *could* add the method to ShulkerEntity. Wwarning when this sanity check fails.
             Logger.getLogger("Lithium EntityClassGroup").warning("Either Lithium EntityClassGroup is broken or something else gave Shulkers the minecart-like collision behavior.");
         }
@@ -91,11 +91,11 @@ public class EntityClassGroup {
         public static final NoDragonClassGroup BOAT_SHULKER_LIKE_COLLISION; //aka entities that other entities will do block-like collisions with when moving
 
         static {
-            String remapped_isCollidable = FabricLoader.getInstance().getMappingResolver().mapMethodName("intermediary", "net.minecraft.class_1297", "method_30948", "()Z");
+            String remapped_isCollidable = FMLLoader.isProduction() ? "canBeCollidedWith" : "isCollidable";
             BOAT_SHULKER_LIKE_COLLISION = new NoDragonClassGroup(
                     (Class<?> entityClass) -> ReflectionUtil.hasMethodOverride(entityClass, Entity.class, true, remapped_isCollidable));
 
-            if ((!BOAT_SHULKER_LIKE_COLLISION.contains(ShulkerEntity.class))) {
+            if ((!BOAT_SHULKER_LIKE_COLLISION.contains(Shulker.class))) {
                 throw new AssertionError();
             }
             BOAT_SHULKER_LIKE_COLLISION.clear();
@@ -103,7 +103,7 @@ public class EntityClassGroup {
 
         public NoDragonClassGroup(Predicate<Class<?>> classFitEvaluator) {
             super(classFitEvaluator);
-            if (classFitEvaluator.test(EnderDragonEntity.class)) {
+            if (classFitEvaluator.test(EnderDragon.class)) {
                 throw new IllegalArgumentException("EntityClassGroup.NoDragonClassGroup cannot be initialized: Must exclude EnderDragonEntity!");
             }
         }

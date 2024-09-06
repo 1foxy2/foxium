@@ -2,11 +2,8 @@ package me.jellysquid.mods.lithium.common.config;
 
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import me.jellysquid.mods.lithium.common.compat.worldedit.WorldEditCompat;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.metadata.CustomValue;
-import net.fabricmc.loader.api.metadata.CustomValue.CvType;
-import net.fabricmc.loader.api.metadata.ModMetadata;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -103,9 +100,8 @@ public class LithiumConfig {
                 LOGGER.warn("Could not write default configuration file", e);
             }
         }
-        config.applyLithiumCompat();
 
-        config.applyModOverrides();
+        config.applyLithiumCompat();
 
         // Check dependencies several times, because one iteration may disable a rule required by another rule
         // This terminates because each additional iteration will disable one or more rules, and there is only a finite number of rules
@@ -180,53 +176,6 @@ public class LithiumConfig {
             }
 
             option.setEnabled(enabled, true);
-        }
-    }
-
-    private void applyModOverrides() {
-        for (ModContainer container : FabricLoader.getInstance().getAllMods()) {
-            ModMetadata meta = container.getMetadata();
-
-            if (meta.containsCustomValue(JSON_KEY_LITHIUM_OPTIONS)) {
-                CustomValue overrides = meta.getCustomValue(JSON_KEY_LITHIUM_OPTIONS);
-
-                if (overrides.getType() != CvType.OBJECT) {
-                    LOGGER.warn("Mod '{}' contains invalid Lithium option overrides, ignoring", meta.getId());
-                    continue;
-                }
-
-                for (Map.Entry<String, CustomValue> entry : overrides.getAsObject()) {
-                    this.applyModOverride(meta, entry.getKey(), entry.getValue());
-                }
-            }
-        }
-    }
-
-    private void applyModOverride(ModMetadata meta, String name, CustomValue value) {
-        if (!name.startsWith("mixin.")) {
-            name = getMixinRuleName(name);
-        }
-        Option option = this.options.get(name);
-
-        if (option == null) {
-            LOGGER.warn("Mod '{}' attempted to override option '{}', which doesn't exist, ignoring", meta.getId(), name);
-            return;
-        }
-
-        if (value.getType() != CvType.BOOLEAN) {
-            LOGGER.warn("Mod '{}' attempted to override option '{}' with an invalid value, ignoring", meta.getId(), name);
-            return;
-        }
-
-        boolean enabled = value.getAsBoolean();
-
-        // disabling the option takes precedence over enabling
-        if (!enabled && option.isEnabled()) {
-            option.clearModsDefiningValue();
-        }
-
-        if (!enabled || option.isEnabled() || option.getDefiningMods().isEmpty()) {
-            option.addModOverride(enabled, meta.getId());
         }
     }
 

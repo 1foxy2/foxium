@@ -1,5 +1,5 @@
 /**
- * This package includes a patch that reduces the memory usage of Chunk ticking. Instead of creating a new ArrayList for
+ * This package includes a patch that reduces the memory usage of ChunkAccess ticking. Instead of creating a new ArrayList for
  * every tick, the previous list is cleared and reused.
  */
 @MixinConfigOption(description = "Reuse large chunk lists")

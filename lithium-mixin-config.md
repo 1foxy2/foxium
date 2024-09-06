@@ -276,8 +276,7 @@ Various entity collision optimizations
 (default: `true`)  
 Skips being pushed by fluids when the nearby chunk sections do not contain this fluid  
 Requirements:
-- `mixin.util.block_tracking=true`
-- `mixin.experimental.entity.block_caching.fluid_pushing=false`  
+- `mixin.util.block_tracking=true`  
   
 ### `mixin.entity.collisions.intersection`
 (default: `true`)  
@@ -370,12 +369,6 @@ Requirements:
 ### `mixin.experimental.entity.block_caching.fire_lava_touching`
 (default: `true`)  
 Skip searching for fire or lava in the burn time countdown logic when they are not on fire and the result does not make a difference. Also use the block listening system to cache whether the entity is touching fire or lava.  
-  
-### `mixin.experimental.entity.block_caching.fluid_pushing`
-(default: `true`)  
-Use the block listening system to cache entity fluid interaction when not touching fluid currents.  
-Requirements:
-- `mixin.util.block_tracking=true`  
   
 ### `mixin.experimental.entity.block_caching.suffocation`
 (default: `true`)  
@@ -624,7 +617,7 @@ Caches entity explosion exposure to avoid duplicate calculations.
 Various improvements to game events (vibrations) that are detected by allays, wardens and several sculk blocks.  
   
 ### `mixin.world.game_events.dispatch`
-(default: `true`)  
+(default: `false`)  
 Create game event dispatchers for chunk sections only when needed, i.e. when a listener is added to a section. This reduces memory usage for chunks that do not have any listeners. The dispatchers are accessed more directly instead of indirectly through chunks. In total this speeds up attempting to dispatch events especially when there are no nearby listeners.  
 Requirements:
 - `mixin.util.data_storage=true`  
