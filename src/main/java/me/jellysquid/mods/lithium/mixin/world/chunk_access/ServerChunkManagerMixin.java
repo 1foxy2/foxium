@@ -129,8 +129,6 @@ public abstract class ServerChunkManagerMixin {
 
         ChunkHolder holder = this.getVisibleChunkIfPresent(key);
 
-        if (holder != null && ((ChunkHolderExtended)holder).getCurrentlyLoading() != null)
-            return ((ChunkHolderExtended) holder).getCurrentlyLoading();
         // Vanilla: Check if the holder is present and is at least of the level we need
         if (this.chunkAbsent(holder, level)) {
             if (create) {

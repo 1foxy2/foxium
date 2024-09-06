@@ -1,5 +1,7 @@
 package me.jellysquid.mods.lithium.common.world.chunk;
 
+import net.minecraft.world.level.chunk.LevelChunk;
+
 public interface ChunkHolderExtended {
     /**
      * Updates the last accessed timestamp for this chunk. This is used to determine if a ticket was recently

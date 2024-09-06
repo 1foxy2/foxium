@@ -30,8 +30,7 @@ public class BlockStateFlags {
     //Counting flags
     public static final TrackedBlockStatePredicate OVERSIZED_SHAPE;
     public static final TrackedBlockStatePredicate PATH_NOT_OPEN;
-    public static final TrackedBlockStatePredicate WATER;
-    public static final TrackedBlockStatePredicate LAVA;
+    public static final TrackedBlockStatePredicate ANY_FLUID;
 
     public static final TrackedBlockStatePredicate[] FLAGS;
 
@@ -73,24 +72,15 @@ public class BlockStateFlags {
         countingFlags.add(OVERSIZED_SHAPE);
 
         if (FluidCachingEntity.class.isAssignableFrom(Entity.class)) {
-            WATER = new TrackedBlockStatePredicate(countingFlags.size()) {
+            ANY_FLUID = new TrackedBlockStatePredicate(countingFlags.size()) {
                 @Override
                 public boolean test(BlockState operand) {
-                    return operand.getFluidState().getType().is(FluidTags.WATER);
+                    return !operand.getFluidState().isEmpty();
                 }
             };
-            countingFlags.add(WATER);
-
-            LAVA = new TrackedBlockStatePredicate(countingFlags.size()) {
-                @Override
-                public boolean test(BlockState operand) {
-                    return operand.getFluidState().getType().is(FluidTags.LAVA);
-                }
-            };
-            countingFlags.add(LAVA);
+            countingFlags.add(ANY_FLUID);
         } else {
-            WATER = null;
-            LAVA = null;
+            ANY_FLUID = null;
         }
 
         if (BlockStatePathingCache.class.isAssignableFrom(BlockBehaviour.BlockStateBase.class)) {

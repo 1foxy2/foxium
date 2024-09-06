@@ -134,30 +134,20 @@ public class VoxelShapeAlignedCuboidOffset extends VoxelShapeAlignedCuboid {
 
     @Override
     public DoubleList getCoords(Direction.Axis axis) {
-        return switch (axis) {
-            case X -> new OffsetFractionalDoubleList(this.getXSegments(), this.xOffset);
-            case Y -> new OffsetFractionalDoubleList(this.getYSegments(), this.yOffset);
-            case Z -> new OffsetFractionalDoubleList(this.getZSegments(), this.zOffset);
-        };
+        return new OffsetFractionalDoubleList(axis.choose(this.getXSegments(), this.getYSegments(), this.getZSegments()),
+                axis.choose(this.xOffset, this.yOffset, this.zOffset));
     }
 
     @Override
     protected double get(Direction.Axis axis, int index) {
-        return switch (axis) {
-            case X -> this.xOffset + (double) index / (double) this.getXSegments();
-            case Y -> this.yOffset + (double) index / (double) this.getYSegments();
-            case Z -> this.zOffset + (double) index / (double) this.getZSegments();
-        };
+        return axis.choose(this.xOffset, this.yOffset, this.zOffset) +
+                ((double) index / (double) axis.choose(this.getXSegments(), this.getYSegments(), this.getZSegments()));
     }
 
     @Override
     protected int findIndex(Direction.Axis axis, double coord) {
-        int numSegments;
-        coord = switch (axis) {
-            case X -> (coord - this.xOffset) * (numSegments = this.getXSegments());
-            case Y -> (coord - this.yOffset) * (numSegments = this.getYSegments());
-            case Z -> (coord - this.zOffset) * (numSegments = this.getZSegments());
-        };
-        return Mth.clamp(Mth.floor(coord), -1, numSegments);
+        coord -= axis.choose(this.xOffset, this.yOffset, this.zOffset);
+        int numSegments = axis.choose(this.getXSegments(), this.getYSegments(), this.getZSegments());
+        return Mth.clamp(Mth.floor(coord * (double) numSegments), -1, numSegments);
     }
 }

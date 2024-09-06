@@ -131,29 +131,18 @@ public class VoxelShapeAlignedCuboid extends VoxelShapeSimpleCube {
 
     @Override
     public DoubleList getCoords(Direction.Axis axis) {
-        return switch (axis) {
-            case X -> new CubePointRange(this.getXSegments());
-            case Y -> new CubePointRange(this.getYSegments());
-            case Z -> new CubePointRange(this.getZSegments());
-        };
+        return new CubePointRange(axis.choose(this.getXSegments(), this.getYSegments(), this.getZSegments()));
     }
 
     @Override
     protected double get(Direction.Axis axis, int index) {
-        return switch (axis) {
-            case X -> (double) index / (double) this.getXSegments();
-            case Y -> (double) index / (double) this.getYSegments();
-            case Z -> (double) index / (double) this.getZSegments();
-        };
+        return (double) index / (double) axis.choose(this.getXSegments(), this.getYSegments(), this.getZSegments());
     }
 
     @Override
     protected int findIndex(Direction.Axis axis, double coord) {
-        int i = switch (axis) {
-            case X -> this.getXSegments();
-            case Y -> this.getYSegments();
-            case Z -> this.getZSegments();
-        };
+        int i = axis.choose(this.getXSegments(), this.getYSegments(), this.getZSegments());
+
         return Mth.clamp(Mth.floor(coord * (double) i), -1, i);
     }
 
