@@ -17,7 +17,7 @@ version = mod_version
 group = mod_group_id
 
 base {
-    archivesName = mod_id
+    archivesName = "foxium"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -81,12 +81,17 @@ repositories {
             maven { url 'https://jitpack.io' }
         }
     }
+    maven {
+        url "https://maven.su5ed.dev/releases"
+    }
 }
 
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
 
     compileOnly 'net.caffeinemc:mixin-config-plugin:1.0-SNAPSHOT'
+
+    compileOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.102.0+2.0.12+1.21.1"
 }
 
 createMixinConfig {

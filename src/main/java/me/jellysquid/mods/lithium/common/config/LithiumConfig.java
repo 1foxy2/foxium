@@ -2,8 +2,12 @@ package me.jellysquid.mods.lithium.common.config;
 
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import me.jellysquid.mods.lithium.common.compat.worldedit.WorldEditCompat;
-import net.neoforged.fml.ModContainer;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.metadata.CustomValue;
+import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.neoforged.fml.ModList;
+import net.neoforged.fml.loading.LoadingModList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,6 +33,10 @@ public class LithiumConfig {
         Option option = this.options.get("mixin.block.hopper.worldedit_compat");
         if (!option.isEnabled() && WorldEditCompat.WORLD_EDIT_PRESENT) {
             option.addModOverride(true, "lithium-fabric");
+        }
+
+        if (LoadingModList.get().getModFileById("ferritecore") != null) { // https://github.com/malte0811/FerriteCore/blob/1.20.0/Fabric/src/main/resources/fabric.mod.json#L38
+            this.options.get("mixin.alloc.blockstate").addModOverride(false, "ferritecore");
         }
     }
 
@@ -103,6 +111,9 @@ public class LithiumConfig {
 
         config.applyLithiumCompat();
 
+        if (LoadingModList.get().getModFileById("connector") != null)
+            config.applyModOverrides();
+
         // Check dependencies several times, because one iteration may disable a rule required by another rule
         // This terminates because each additional iteration will disable one or more rules, and there is only a finite number of rules
         //noinspection StatementWithEmptyBody
@@ -176,6 +187,53 @@ public class LithiumConfig {
             }
 
             option.setEnabled(enabled, true);
+        }
+    }
+
+    private void applyModOverrides() {
+        for (ModContainer container : FabricLoader.getInstance().getAllMods()) {
+            ModMetadata meta = container.getMetadata();
+
+            if (meta.containsCustomValue(JSON_KEY_LITHIUM_OPTIONS)) {
+                CustomValue overrides = meta.getCustomValue(JSON_KEY_LITHIUM_OPTIONS);
+
+                if (overrides.getType() != CustomValue.CvType.OBJECT) {
+                    LOGGER.warn("Mod '{}' contains invalid Lithium option overrides, ignoring", meta.getId());
+                    continue;
+                }
+
+                for (Map.Entry<String, CustomValue> entry : overrides.getAsObject()) {
+                    this.applyModOverride(meta, entry.getKey(), entry.getValue());
+                }
+            }
+        }
+    }
+
+    private void applyModOverride(ModMetadata meta, String name, CustomValue value) {
+        if (!name.startsWith("mixin.")) {
+            name = getMixinRuleName(name);
+        }
+        Option option = this.options.get(name);
+
+        if (option == null) {
+            LOGGER.warn("Mod '{}' attempted to override option '{}', which doesn't exist, ignoring", meta.getId(), name);
+            return;
+        }
+
+        if (value.getType() != CustomValue.CvType.BOOLEAN) {
+            LOGGER.warn("Mod '{}' attempted to override option '{}' with an invalid value, ignoring", meta.getId(), name);
+            return;
+        }
+
+        boolean enabled = value.getAsBoolean();
+
+        // disabling the option takes precedence over enabling
+        if (!enabled && option.isEnabled()) {
+            option.clearModsDefiningValue();
+        }
+
+        if (!enabled || option.isEnabled() || option.getDefiningMods().isEmpty()) {
+            option.addModOverride(enabled, meta.getId());
         }
     }
 
