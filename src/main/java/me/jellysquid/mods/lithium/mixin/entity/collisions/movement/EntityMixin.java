@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Mixin(Entity.class)
@@ -33,7 +34,7 @@ public abstract class EntityMixin {
     public abstract AABB getBoundingBox();
 
     @Redirect(
-            method = "collide",
+            method = "collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/level/Level;getEntityCollisions(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/AABB;)Ljava/util/List;"
@@ -80,6 +81,7 @@ public abstract class EntityMixin {
     public static Vec3 collideBoundingBox(@Nullable Entity entity, Vec3 movement, AABB entityBoundingBox, Level world, List<VoxelShape> entityCollisions) {
         return lithium$CollideMovement(entity, movement, entityBoundingBox, world, entityCollisions, null);
     }
+
     @Unique
     private static Vec3 lithium$CollideMovement(@Nullable Entity entity, Vec3 movement, AABB entityBoundingBox, Level world, List<VoxelShape> entityCollisions, LocalBooleanRef requireAddEntities) {
         //vanilla order: entities, world border, blocks.

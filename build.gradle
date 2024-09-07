@@ -86,8 +86,6 @@ repositories {
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
 
-    implementation('com.github.2No2Name:McTester:v0.4.2')
-
     compileOnly 'net.caffeinemc:mixin-config-plugin:1.0-SNAPSHOT'
 }
 

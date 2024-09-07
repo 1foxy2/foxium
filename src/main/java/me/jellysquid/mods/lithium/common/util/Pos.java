@@ -13,10 +13,10 @@ public class Pos {
             return view.getMinBuildHeight();
         }
         public static int getMaxYInclusive(LevelHeightAccessor view) {
-            return view.getMinBuildHeight() - 1;
+            return view.getMaxBuildHeight() - 1;
         }
         public static int getMaxYExclusive(LevelHeightAccessor view) {
-            return view.getMinBuildHeight();
+            return view.getMaxBuildHeight();
         }
 
         public static int getMaxInSectionCoord(int sectionCoord) {

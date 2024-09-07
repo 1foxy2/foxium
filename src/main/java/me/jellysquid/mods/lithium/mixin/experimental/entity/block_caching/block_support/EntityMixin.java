@@ -26,7 +26,7 @@ public abstract class EntityMixin implements BlockCacheProvider, SupportingBlock
     public abstract Level level();
 
     @Shadow
-    protected abstract double getGravity();
+    protected abstract double getDefaultGravity();
 
     @Shadow
     public Optional<BlockPos> mainSupportingBlockPos;
@@ -60,7 +60,7 @@ public abstract class EntityMixin implements BlockCacheProvider, SupportingBlock
         BlockCache bc = this.lithium$getBlockCache();
         if (bc.isTracking()) {
             bc.setCanSkipSupportingBlockSearch(true);
-            if (pos.isPresent() && this.getGravity() > 0D) {
+            if (pos.isPresent() && this.getDefaultGravity() > 0D) {
                 bc.cacheSupportingBlock(this.level().getBlockState(pos.get()));
             }
         }
