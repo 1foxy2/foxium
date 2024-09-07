@@ -7,11 +7,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 
 /**
- * Provides the ability for mods to allow Lithium's hopper optimizations to access their inventories' for item transfers.
- * This exists because Lithium's optimized hopper logic will only interact with inventories more efficiently than
- * vanilla if the stack list can be directly accessed and replaced with Lithium's custom stack list.
+ * Provides the ability for mods to allow foxium's hopper optimizations to access their inventories' for item transfers.
+ * This exists because foxium's optimized hopper logic will only interact with inventories more efficiently than
+ * vanilla if the stack list can be directly accessed and replaced with foxium's custom stack list.
  * It is not required to implement this interface, but doing so will allow the mod's inventories to benefit from
- * Lithium's optimizations.
+ * foxium's optimizations.
  * <p>
  * This interface should be implemented by your {@link net.minecraft.world.Container} or
  * {@link net.minecraft.world.WorldlyContainer} type to access the stack list.

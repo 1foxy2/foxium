@@ -10,13 +10,17 @@ version="${mod_version}" #mandatory
 displayName="${mod_name}" #mandatory
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 #displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
-#logoFile="examplemod.png" #optional
-#credits="" #optional
+logoFile="logo.png" #optional
+credits="some improvements was taken from radium" #optional
 authors="${mod_authors}" #optional
 description='''${mod_description}'''
 
 [[mixins]]
-config="${mod_id}.mixins.json"
+config="lithium.mixins.json"
+
+[modproperties.modmenu]
+links=["mod_menu.original=https://modrinth.com/mod/lithium"] # a link, before = is the translation key and after is the url
+sources="https://github.com/1foxy2/foxium" # a link to sources of the mod
 
 [[dependencies.${mod_id}]] #optional
     modId="neoforge" #mandatory

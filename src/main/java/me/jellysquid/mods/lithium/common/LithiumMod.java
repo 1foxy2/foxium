@@ -11,9 +11,10 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.registries.ModifyRegistriesEvent;
 import net.neoforged.neoforge.registries.callback.BakeCallback;
 
-@Mod(value = "lithium")
+@Mod(value = LithiumMod.MOD_ID)
 public class LithiumMod {
     public static LithiumConfig CONFIG;
+    public static final String MOD_ID = "foxium";
 
     public LithiumMod(IEventBus modEventBus) {
         if (CONFIG == null) {
