@@ -38,7 +38,7 @@ public interface LithiumInventory extends Container {
 
     /**
      * Setter for the inventory stack list of this inventory.
-     * Used to replace the stack list with Lithium's custom stack list.
+     * Used to replace the stack list with foxium's custom stack list.
      *
      * @param inventory inventory stack list
      */

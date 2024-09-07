@@ -26,7 +26,7 @@ public class EntityClassGroup {
     public static final EntityClassGroup CUSTOM_COLLIDE_LIKE_MINECART_BOAT_WINDCHARGE; //aka entities that will attempt to collide with all other entities when moving
 
     static {
-        String remapped_collidesWith = FMLLoader.isProduction() ? "canCollideWith" : "collidesWith";
+        String remapped_collidesWith = "canCollideWith";
         CUSTOM_COLLIDE_LIKE_MINECART_BOAT_WINDCHARGE = new EntityClassGroup(
                 (Class<?> entityClass) -> ReflectionUtil.hasMethodOverride(entityClass, Entity.class, true, remapped_collidesWith, Entity.class));
 
@@ -91,7 +91,7 @@ public class EntityClassGroup {
         public static final NoDragonClassGroup BOAT_SHULKER_LIKE_COLLISION; //aka entities that other entities will do block-like collisions with when moving
 
         static {
-            String remapped_isCollidable = FMLLoader.isProduction() ? "canBeCollidedWith" : "isCollidable";
+            String remapped_isCollidable = "canBeCollidedWith";
             BOAT_SHULKER_LIKE_COLLISION = new NoDragonClassGroup(
                     (Class<?> entityClass) -> ReflectionUtil.hasMethodOverride(entityClass, Entity.class, true, remapped_isCollidable));
 

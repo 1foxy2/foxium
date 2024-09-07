@@ -28,7 +28,7 @@ public class PushableEntityClassGroup {
     public static final EntityClassGroup MAYBE_PUSHABLE;
 
     static {
-        String remapped_isClimbing = FMLLoader.isProduction() ? "onClimbable" : "isClimbing";
+        String remapped_isClimbing = "onClimbable";
         String remapped_isPushable = "isPushable";
         CACHABLE_UNPUSHABILITY = new EntityClassGroup(
                 (Class<?> entityClass) -> {

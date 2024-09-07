@@ -25,19 +25,19 @@ public class ReflectionUtil {
             } catch (NoSuchMethodException e) {
                 clazz = clazz.getSuperclass();
             } catch (NoClassDefFoundError error) {
-                Logger logger = LogManager.getLogger("Lithium Class Analysis");
-                logger.warn("Lithium Class Analysis Error: Class " + clazz.getName() + " cannot be analysed, because" +
+                Logger logger = LogManager.getLogger("Foxium Class Analysis");
+                logger.warn("Foxium Class Analysis Error: Class " + clazz.getName() + " cannot be analysed, because" +
                         " getting declared methods crashes with NoClassDefFoundError: " + error.getMessage() +
                         ". This is usually caused by modded" +
                         " entities declaring methods that have a return type or parameter type that is annotated" +
                         " with @Environment(value=EnvType.CLIENT). Loading the type is not possible, because" +
                         " it only exists in the CLIENT environment. The recommended fix is to annotate the method with" +
                         " this argument or return type with the same annotation." +
-                        " Lithium handles this error by assuming the class cannot be included in some optimizations.");
+                        " Foxium handles this error by assuming the class cannot be included in some optimizations.");
                 return fallbackResult;
             } catch (Throwable e) {
                 final String crashedClass = clazz.getName();
-                CrashReport crashReport = CrashReport.forThrowable(e, "Lithium Class Analysis");
+                CrashReport crashReport = CrashReport.forThrowable(e, "Foxium Class Analysis");
                 CrashReportCategory crashReportSection = crashReport.addCategory(e.getClass().toString() + " when getting declared methods.");
                 crashReportSection.setDetail("Analyzed class", crashedClass);
                 crashReportSection.setDetail("Analyzed method name", methodName);
@@ -52,7 +52,7 @@ public class ReflectionUtil {
     //How to find the remapped methods:
     //1) Run in the debugger: System.out.println(FabricLoader.getInstance().getMappingResolver().getNamespaceData("intermediary").methodNames)
     //2) Ctrl+F for the method name, in this case "onEntityCollision". Make sure to find the correct one.
-    private static final String REMAPPED_ON_ENTITY_COLLISION = FMLLoader.isProduction() ? "entityInside" : "onEntityCollision";
+    private static final String REMAPPED_ON_ENTITY_COLLISION = "entityInside";
     private static final WeakHashMap<Class<?>, Boolean> CACHED_IS_ENTITY_TOUCHABLE = new WeakHashMap<>();
     public static boolean isBlockStateEntityTouchable(BlockState operand) {
         Class<? extends Block> blockClazz = operand.getBlock().getClass();

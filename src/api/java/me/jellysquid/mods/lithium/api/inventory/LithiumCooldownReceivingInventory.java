@@ -22,7 +22,7 @@ public interface LithiumCooldownReceivingInventory {
      * NOTE: foxium does not replace all of vanilla's item transfers. Mod authors still need to implement
      * their own hooks for vanilla code even when they require users to install foxium.
      *
-     * @return Whether this inventory wants to receive transfer cooldowns from lithium's code
+     * @return Whether this inventory wants to receive transfer cooldowns from foxium's code
      */
     default boolean canReceiveTransferCooldown() {
         return false;
