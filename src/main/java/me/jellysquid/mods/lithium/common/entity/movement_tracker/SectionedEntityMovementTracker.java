@@ -95,7 +95,7 @@ public abstract class SectionedEntityMovementTracker<E extends EntityAccess, S> 
             for (int x = trackedSections.chunkX1(); x < trackedSections.chunkX2(); x++) {
                 for (int z = trackedSections.chunkZ1(); z < trackedSections.chunkZ2(); z++) {
                     for (int y = trackedSections.chunkY1(); y < trackedSections.chunkY2(); y++) {
-                        EntitySection<E> section = cache.getSection(SectionPos.asLong(x, y, z));
+                        EntitySection<E> section = cache.getOrCreateSection(SectionPos.asLong(x, y, z));
                         EntityMovementTrackerSection sectionAccess = (EntityMovementTrackerSection) section;
                         this.sortedSections.add(section);
                         sectionAccess.lithium$addListener(this);
