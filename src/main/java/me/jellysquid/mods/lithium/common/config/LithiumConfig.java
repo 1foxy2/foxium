@@ -3,19 +3,17 @@ package me.jellysquid.mods.lithium.common.config;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import me.jellysquid.mods.lithium.common.compat.worldedit.WorldEditCompat;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.CustomValue;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.LoadingModList;
+import net.neoforged.fml.loading.moddiscovery.ModInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.jar.JarFile;
 
 /**
  * Documentation of these options: https://github.com/jellysquid3/lithium-fabric/wiki/Configuration-File
@@ -44,7 +42,7 @@ public class LithiumConfig {
         // Defines the default rules which can be configured by the user or other mods.
         InputStream defaultPropertiesStream = LithiumConfig.class.getResourceAsStream("/assets/lithium/lithium-mixin-config-default.properties");
         if (defaultPropertiesStream == null) {
-            throw new IllegalStateException("Lithium mixin config default properties could not be read!");
+            throw new IllegalStateException("Foxium mixin config default properties could not be read!");
         }
         try (BufferedReader propertiesReader = new BufferedReader(new InputStreamReader(defaultPropertiesStream))) {
             Properties properties = new Properties();
@@ -52,12 +50,12 @@ public class LithiumConfig {
             properties.forEach((ruleName, enabled) -> this.addMixinRule((String) ruleName, Boolean.parseBoolean((String) enabled)));
         } catch (IOException e) {
             e.printStackTrace();
-            throw new IllegalStateException("Lithium mixin config default properties could not be read!");
+            throw new IllegalStateException("Foxium mixin config default properties could not be read!");
         }
 
         InputStream dependenciesStream = LithiumConfig.class.getResourceAsStream("/assets/lithium/lithium-mixin-config-dependencies.properties");
         if (dependenciesStream == null) {
-            throw new IllegalStateException("Lithium mixin config dependencies could not be read!");
+            throw new IllegalStateException("Foxium mixin config dependencies could not be read!");
         }
         try (BufferedReader propertiesReader = new BufferedReader(new InputStreamReader(dependenciesStream))) {
             Properties properties = new Properties();
@@ -80,7 +78,7 @@ public class LithiumConfig {
             );
         } catch (IOException e) {
             e.printStackTrace();
-            throw new IllegalStateException("Lithium mixin config dependencies could not be read!");
+            throw new IllegalStateException("Foxium mixin config dependencies could not be read!");
         }
     }
 
@@ -111,8 +109,7 @@ public class LithiumConfig {
 
         config.applyLithiumCompat();
 
-        if (LoadingModList.get().getModFileById("connector") != null)
-            config.applyModOverrides();
+        config.applyModOverrides(LoadingModList.get().getModFileById("connector") != null);
 
         // Check dependencies several times, because one iteration may disable a rule required by another rule
         // This terminates because each additional iteration will disable one or more rules, and there is only a finite number of rules
@@ -190,50 +187,76 @@ public class LithiumConfig {
         }
     }
 
-    private void applyModOverrides() {
-        for (ModContainer container : FabricLoader.getInstance().getAllMods()) {
-            ModMetadata meta = container.getMetadata();
+    private void applyModOverrides(boolean hasConnector) {
+        //checking if there is sinytra connector
+        if (hasConnector) {
+            applyModOverridesWithConnector();
+            return;
+        }
 
-            if (meta.containsCustomValue(JSON_KEY_LITHIUM_OPTIONS)) {
-                CustomValue overrides = meta.getCustomValue(JSON_KEY_LITHIUM_OPTIONS);
+        for (ModInfo modInfo : LoadingModList.get().getMods()) {
+            applyModOverridesWithoutConnector(modInfo);
+        }
+    }
 
-                if (overrides.getType() != CustomValue.CvType.OBJECT) {
-                    LOGGER.warn("Mod '{}' contains invalid Lithium option overrides, ignoring", meta.getId());
-                    continue;
+    private void applyModOverridesWithConnector() {
+        for (ModInfo modInfo : LoadingModList.get().getMods()) {
+            if (isFabricMod(modInfo.getOwningFile().getFile().getFilePath())) {
+                ModMetadata meta = FabricLoader.getInstance().getModContainer(modInfo.getModId()).get().getMetadata();
+
+                if (meta.containsCustomValue(JSON_KEY_LITHIUM_OPTIONS)) {
+                    CustomValue overrides = meta.getCustomValue(JSON_KEY_LITHIUM_OPTIONS);
+
+                    if (overrides.getType() != CustomValue.CvType.OBJECT) {
+                        LOGGER.warn("Mod '{}' contains invalid Foxium option overrides, ignoring", meta.getId());
+                        continue;
+                    }
+
+                    for (Map.Entry<String, CustomValue> entry : overrides.getAsObject()) {
+                        if (entry.getValue().getType() == CustomValue.CvType.BOOLEAN) {
+                            this.applyModOverride(meta.getId(), entry.getKey(), entry.getValue().getAsBoolean());
+                        } else
+                            LOGGER.warn("Mod '{}' attempted to override option '{}' with an invalid value, ignoring", meta.getId(), entry.getKey());
+                    }
                 }
+            } else applyModOverridesWithoutConnector(modInfo);
+        }
+    }
 
-                for (Map.Entry<String, CustomValue> entry : overrides.getAsObject()) {
-                    this.applyModOverride(meta, entry.getKey(), entry.getValue());
-                }
+    private void applyModOverridesWithoutConnector(ModInfo modInfo) {
+        if (modInfo.getOwningFile().<Map<String, ArrayList<String>>>getConfigElement("modproperties", "foxium").orElse(new HashMap<>()).get("disable") instanceof ArrayList<String> list) {
+            for (String string : list) {
+                this.applyModOverride(modInfo.getModId(), string, false);
             }
         }
     }
 
-    private void applyModOverride(ModMetadata meta, String name, CustomValue value) {
+    public static boolean isFabricMod(Path mod) {
+        try (JarFile jarFile = new JarFile(mod.toFile())) {
+            return jarFile.getEntry("fabric.mod.json") != null;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    private void applyModOverride(String modid, String name, Boolean value) {
         if (!name.startsWith("mixin.")) {
             name = getMixinRuleName(name);
         }
         Option option = this.options.get(name);
 
         if (option == null) {
-            LOGGER.warn("Mod '{}' attempted to override option '{}', which doesn't exist, ignoring", meta.getId(), name);
+            LOGGER.warn("Mod '{}' attempted to override option '{}', which doesn't exist, ignoring", modid, name);
             return;
         }
-
-        if (value.getType() != CustomValue.CvType.BOOLEAN) {
-            LOGGER.warn("Mod '{}' attempted to override option '{}' with an invalid value, ignoring", meta.getId(), name);
-            return;
-        }
-
-        boolean enabled = value.getAsBoolean();
 
         // disabling the option takes precedence over enabling
-        if (!enabled && option.isEnabled()) {
+        if (!value && option.isEnabled()) {
             option.clearModsDefiningValue();
         }
 
-        if (!enabled || option.isEnabled() || option.getDefiningMods().isEmpty()) {
-            option.addModOverride(enabled, meta.getId());
+        if (!value || option.isEnabled() || option.getDefiningMods().isEmpty()) {
+            option.addModOverride(value, modid);
         }
     }
 
@@ -293,12 +316,12 @@ public class LithiumConfig {
         }
 
         try (Writer writer = new FileWriter(file)) {
-            writer.write("# This is the configuration file for Lithium.\n");
+            writer.write("# This is the configuration file for Foxium.\n");
             writer.write("# This file exists for debugging purposes and should not be configured otherwise.\n");
             writer.write("# Before configuring anything, take a backup of the worlds that will be opened.\n");
             writer.write("#\n");
             writer.write("# You can find information on editing this file and all the available options here:\n");
-            writer.write("# https://github.com/jellysquid3/lithium-fabric/wiki/Configuration-File\n");
+            writer.write("# https://github.com/1foxy2/foxium/wiki\n");
             writer.write("#\n");
             writer.write("# By default, this file will be empty except for this notice.\n");
         }

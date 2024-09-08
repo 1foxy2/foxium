@@ -20,8 +20,8 @@ public class LithiumMod {
         if (CONFIG == null) {
             throw new IllegalStateException("The mixin plugin did not initialize the config! Did it not load?");
         }
-        modEventBus.addListener(EventPriority.LOWEST, this::modifyRegistries);
 
+        modEventBus.addListener(EventPriority.LOWEST, this::modifyRegistries);
     }
 
     private void modifyRegistries(ModifyRegistriesEvent event) {

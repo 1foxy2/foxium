@@ -95,7 +95,7 @@ public class ChunkTickSchedulerMixin<T> {
             clonedType2Index.put(type, typeIndex = clonedType2Index.size());
             TYPE_2_INDEX = clonedType2Index;
             if (typeIndex >= 4096) {
-                throw new IllegalStateException("Lithium SavedTick Scheduler assumes at most 4096 different block types that receive scheduled ticks exist! Add mixin.world.tick_scheduler=false to the lithium properties/config to disable the optimization!");
+                throw new IllegalStateException("Foxium SavedTick Scheduler assumes at most 4096 different block types that receive scheduled ticks exist! Add mixin.world.tick_scheduler=false to the lithium properties/config to disable the optimization!");
             }
         }
         return typeIndex;

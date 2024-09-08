@@ -48,7 +48,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * We can avoid calling those last two methods on redstone wires altogether, since we know
  * they should return 0.
  * <br>
- * These changes can lead to a mspt reduction of up to 30% on top of Lithium's other
+ * These changes can lead to a mspt reduction of up to 30% on top of Foxium's other
  * performance improvements.
  * 
  * @author Space Walker

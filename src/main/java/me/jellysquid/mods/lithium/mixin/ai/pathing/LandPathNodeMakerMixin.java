@@ -64,7 +64,7 @@ public abstract class LandPathNodeMakerMixin {
      * If the function is called with usual inputs (nodeType != null), it behaves normally.
      * If the function is called with nodeType == null, only the passed position is checked for its neighbor behavior.
      * <p>
-     * This allows Lithium to call this function to initialize its caches. It also allows using this function as fallback
+     * This allows Foxium to call this function to initialize its caches. It also allows using this function as fallback
      * for dynamic blocks (shulker boxes and fabric-api dynamic definitions)
      *
      * @author 2No2Name

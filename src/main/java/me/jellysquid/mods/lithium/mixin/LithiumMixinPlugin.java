@@ -16,7 +16,7 @@ import java.util.Set;
 public class LithiumMixinPlugin implements IMixinConfigPlugin {
     private static final String MIXIN_PACKAGE_ROOT = "me.jellysquid.mods.lithium.mixin.";
 
-    private final Logger logger = LogManager.getLogger("Lithium");
+    private final Logger logger = LogManager.getLogger("Foxium");
 
     private LithiumConfig config;
 
@@ -25,10 +25,10 @@ public class LithiumMixinPlugin implements IMixinConfigPlugin {
         try {
             this.config = LithiumConfig.load(new File("./config/lithium.properties"));
         } catch (Exception e) {
-            throw new RuntimeException("Could not load configuration file for Lithium", e);
+            throw new RuntimeException("Could not load configuration file for Foxium", e);
         }
 
-        this.logger.info("Loaded configuration file for Lithium: {} options available, {} override(s) found",
+        this.logger.info("Loaded configuration file for Foxium: {} options available, {} override(s) found",
                 this.config.getOptionCount(), this.config.getOptionOverrideCount());
 
         LithiumMod.CONFIG = this.config;

@@ -146,19 +146,19 @@ public abstract class ServerChunkManagerMixin {
                     throw Util.pauseInIde(new IllegalStateException("No chunk holder after ticket has been added"));
                 }
             } else {
-                //Vanilla: Use UNLOADED_FUTURE. Lithium: Just return null immediately.
+                //Vanilla: Use UNLOADED_FUTURE. Foxium: Just return null immediately.
                 // The holder is absent, and we weren't asked to create anything, so return null
                 return null;
             }
         } else if (create && ((ChunkHolderExtended) holder).lithium$updateLastAccessTime(this.time)) {
             // Vanilla: Always create the ticket.
-            // Lithium: Only create a new chunk ticket if one hasn't already been submitted this tick
+            // Foxium: Only create a new chunk ticket if one hasn't already been submitted this tick
             // This maintains vanilla behavior (preventing chunks from being immediately unloaded) while also
             // eliminating the cost of submitting a ticket for most chunk fetches
             this.createChunkLoadTicket(x, z, level);
         }
 
-        // Lithium: Attempt to directly get the chunk from the finished future:
+        // Foxium: Attempt to directly get the chunk from the finished future:
         if (!((AbstractChunkHolderAccessor) holder).invokeCannotBeLoaded(leastStatus)) {
             CompletableFuture<ChunkResult<ChunkAccess>> directlyAccessedFuture = ((AbstractChunkHolderAccessor) holder).lithium$getChunkFuturesByStatus().get(leastStatus.getIndex());
             if (directlyAccessedFuture != null && directlyAccessedFuture.isDone()) {
@@ -169,10 +169,10 @@ public abstract class ServerChunkManagerMixin {
             }
         }
 
-        // Vanilla: Always call holder.load(). Lithium: Fall back to vanilla in case the fast-path did not work.
+        // Vanilla: Always call holder.load(). Foxium: Fall back to vanilla in case the fast-path did not work.
         CompletableFuture<ChunkResult<ChunkAccess>> loadFuture = holder.scheduleChunkGenerationTask(leastStatus, this.chunkMap);
 
-        // Vanilla: Always call runTasks(). Lithium: Only call runTasks() if it will perform work.
+        // Vanilla: Always call runTasks(). Foxium: Only call runTasks() if it will perform work.
         if (!loadFuture.isDone()) {
             // Perform other chunk tasks while waiting for this future to complete
             // This returns when either the future is done or there are no other tasks remaining

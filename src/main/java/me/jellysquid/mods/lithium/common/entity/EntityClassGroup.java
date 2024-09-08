@@ -8,7 +8,6 @@ import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.entity.projectile.windcharge.BreezeWindCharge;
 import net.minecraft.world.entity.projectile.windcharge.WindCharge;
 import net.minecraft.world.entity.vehicle.Minecart;
-import net.neoforged.fml.loading.FMLLoader;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -39,7 +38,7 @@ public class EntityClassGroup {
         }
         if ((CUSTOM_COLLIDE_LIKE_MINECART_BOAT_WINDCHARGE.contains(Shulker.class))) {
             //should not throw an Error here, because another mod *could* add the method to ShulkerEntity. Wwarning when this sanity check fails.
-            Logger.getLogger("Lithium EntityClassGroup").warning("Either Lithium EntityClassGroup is broken or something else gave Shulkers the minecart-like collision behavior.");
+            Logger.getLogger("Foxium EntityClassGroup").warning("Either Foxium EntityClassGroup is broken or something else gave Shulkers the minecart-like collision behavior.");
         }
         CUSTOM_COLLIDE_LIKE_MINECART_BOAT_WINDCHARGE.clear();
     }
