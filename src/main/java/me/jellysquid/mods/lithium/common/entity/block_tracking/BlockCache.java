@@ -1,12 +1,10 @@
 package me.jellysquid.mods.lithium.common.entity.block_tracking;
 
 import it.unimi.dsi.fastutil.objects.Object2DoubleArrayMap;
-import it.unimi.dsi.fastutil.objects.Reference2DoubleArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import me.jellysquid.mods.lithium.common.block.BlockStateFlags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.fluids.FluidType;
 
@@ -111,6 +109,14 @@ public final class BlockCache {
 
     public void setCachedFluidHeight(FluidType fluid, double fluidHeight) {
         this.fluidType2FluidHeightMap.put(fluid, fluidHeight);
+    }
+
+    public Object2DoubleMap<FluidType> getCachedFluidHeightMap() {
+        if(this.isTracking()) {
+            return this.fluidType2FluidHeightMap;
+        } else {
+            return null;
+        }
     }
 
     public byte getIsTouchingFireLava() {

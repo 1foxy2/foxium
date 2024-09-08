@@ -11,4 +11,6 @@ public interface ChunkHolderExtended {
      * @return True if the chunk needs a new ticket to be created in order to retain it, otherwise false
      */
     boolean lithium$updateLastAccessTime(long time);
+
+    LevelChunk getCurrentlyLoading();
 }

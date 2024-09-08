@@ -1,5 +1,6 @@
 package me.jellysquid.mods.lithium.common.compat.fabric_transfer_api_v1;
 
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.HopperBlock;
@@ -19,7 +20,7 @@ public class FabricTransferApiCompat {
         BlockPos targetPos = hopperBlockEntity.getBlockPos().relative(direction);
 
         //noinspection UnstableApiUsage
-        Object target = null; // ItemStorage.SIDED.find(hopperBlockEntity.getWorld(), targetPos, direction.getOpposite());
+        Object target = ItemStorage.SIDED.find(hopperBlockEntity.getLevel(), targetPos, direction.getOpposite());
         return target != null;
     }
 }
