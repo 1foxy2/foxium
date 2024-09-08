@@ -19,7 +19,10 @@ description='''${mod_description}'''
 config="lithium.mixins.json"
 
 [modproperties.modmenu]
-links=["mod_menu.original=https://modrinth.com/mod/lithium"] # a link, before = is the translation key and after is the url
+links=[
+    "mod_menu.original=https://modrinth.com/mod/lithium",
+    "mod_menu.wiki=https://github.com/1foxy2/foxium/wiki"
+]
 sources="https://github.com/1foxy2/foxium" # a link to sources of the mod
 
 [[dependencies.${mod_id}]] #optional
